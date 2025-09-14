@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Buscador de Contenido</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial; margin: 10px; }
+        input { width: 100%; padding: 8px; font-size: 16px; }
+        button { padding: 10px; width: 100%; font-size: 16px; }
+        ul { list-style: none; padding: 0; }
+        li { margin-bottom: 15px; border-bottom: 1px solid #ccc; }
+        img { width: 80px; }
+    </style>
+</head>
+<body>
+    <h1>Busca Películas/Series</h1>
+    <input type="text" id="searchInput" placeholder="Título (ej. The Matrix)">
+    <button onclick="buscarContenido()">Buscar</button>
+    <ul id="results"></ul>
+
+    <script>
+        const firebaseConfig = { /* Pega tu firebaseConfig aquí */ };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function buscarContenido() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (!query) return alert('Ingresa un título');
+            const snapshot = await db.collection('videos')
+                .where('title_lowercase', '>=', query)
+                .where('title_lowercase', '<=', query + '\uf8ff')
+                .orderBy('timestamp', 'desc')
+                .limit(10)
+                .get();
+
+            const resultsList = document.getElementById('results');
+            resultsList.innerHTML = '';
+            if (snapshot.empty) {
+                resultsList.innerHTML = '<li>No se encontró contenido.</li>';
+            } else {
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <h3>${data.title} ${data.episode ? '- ' + data.episode : ''}</h3>
+                        <img src="${data.poster}" alt="Póster">
+                        <p>${data.description}</p>
+                        <a href="/player.html?embed=${encodeURIComponent(data.embedUrl)}&ads_type=propios" target="_blank">Ver Reproductor</a>
+                    `;
+                    resultsList.appendChild(li);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
