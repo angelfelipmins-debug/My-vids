@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reproductor</title>
+    <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
+    <script src="https://unpkg.com/@videojs/vast-vpaid@latest/bin/videojs.vast.vpaid.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial; margin: 10px; }
+        .video-js { width: 100%; height: auto; }
+        #poster { width: 100px; margin-bottom: 10px; }
+        h2, p { font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h2 id="title"></h2>
+    <img id="poster" src="">
+    <p id="description"></p>
+    <video id="player" class="video-js" controls preload="auto" playsinline></video>
+    <p>Si no carga, recarga para nuevo token.</p>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const embedUrl = urlParams.get('embed');
+        const adsType = urlParams.get('ads_type') || 'propios';
+        const title = urlParams.get('title') || 'Video';
+        const episode = urlParams.get('episode') || '';
+        const poster = urlParams.get('poster') || '';
+        const desc = urlParams.get('desc') || '';
+        document.getElementById('title').textContent = title + (episode ? ' - ' + episode : '');
+        document.getElementById('poster').src = poster;
+        document.getElementById('description').textContent = desc;
+
+        if (embedUrl) {
+            const apiUrl = 'https://tu-app.onrender.com/api/generate-token?embed_url=' + encodeURIComponent(embedUrl);
+            fetch(apiUrl)
+                .then(res => res.json())
+                .then(data => {
+                    const tokenUrl = data.token_url;
+                    if (tokenUrl && tokenUrl !== 'Error: No URL encontrada') {
+                        const player = videojs('player', {
+                            sources: [{ src: tokenUrl, type: 'application/x-mpegURL' }],
+                            autoplay: true,
+                            fluid: true
+                        });
+                        const vastUrl = `https://tu-app.onrender.com/vast?ads_type=${adsType}&ad_id=default`;
+                        player.vast({
+                            url: vastUrl,
+                            dynamicAllocation: true,
+                            skipButton: true,
+                            errorCallback: err => console.log('Ad error:', err)
+                        });
+                        player.play();
+                    } else {
+                        document.body.innerHTML += '<p>Error: Recarga o verifica enlace.</p>';
+                    }
+                })
+                .catch(err => document.body.innerHTML += '<p>Error API: ' + err + '</p>');
+        } else {
+            document.body.innerHTML = '<p>Falta enlace embed.</p>';
+        }
+    </script>
+</body>
+</html>
