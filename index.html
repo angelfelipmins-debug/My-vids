@@ -71,8 +71,8 @@ const firebaseConfig = {
                 description: description,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
-
-            const playerUrl = `https://mi-servicio-gratis.web.app/player.html?embed=${encodeURIComponent(embedUrl)}&ads_type=${adsType}&title=${encodeURIComponent(title)}&episode=${encodeURIComponent(episode)}&poster=${encodeURIComponent(poster)}&desc=${encodeURIComponent(description)}`;
+            
+            const playerUrl = `https://angelfelipmins-debug.github.io/My-vids/player.html?embed=${encodeURIComponent(embedUrl)}&ads_type=${adsType}&title=${encodeURIComponent(title)}&episode=${encodeURIComponent(episode)}&poster=${encodeURIComponent(poster)}&desc=${encodeURIComponent(description)}`;
             document.getElementById('status').innerHTML = `<p>URL: <a href="${playerUrl}" target="_blank">${playerUrl}</a></p>`;
             document.getElementById('embedCode').style.display = 'block';
             document.getElementById('embedCode').innerHTML = `Iframe: <iframe src="${playerUrl}" width="100%" height="360" frameborder="0" allowfullscreen></iframe>`;
