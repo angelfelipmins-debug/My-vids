@@ -47,7 +47,7 @@ const firebaseConfig = {
             const adsType = document.getElementById('adsType').value;
             if (!embedUrl || !title) return alert('Falta enlace o título');
 
-            const tmdbApiKey = 'TU_TMDB_API_KEY';  // Reemplaza
+            const tmdbApiKey = 'c71d55c790adcb0fa9ea6ebcbc9a61a7';  // Reemplaza
             const searchType = episode ? 'tv' : 'movie';
             const query = encodeURIComponent(title + (episode ? ' ' + episode : ''));
             let tmdbId = null, poster = '', description = '';
